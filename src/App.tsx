@@ -2,8 +2,8 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Columns2, Download, RotateCcw, Upload, Sparkles, Volume2, VolumeX } from 'lucide-react';
 import { BackgroundBokeh } from './components/BackgroundBokeh';
 import { DialsRail } from './components/DialsRail';
+import { CineStockIntro } from './components/CineStockIntro';
 import { ExportModal } from './components/ExportModal';
-import { IntroSessionGate } from './components/IntroSessionGate';
 import { MarqueeBanner } from './components/MarqueeBanner';
 import { MonitorStage } from './components/MonitorStage';
 import { StockRail } from './components/StockRail';
@@ -45,8 +45,8 @@ function paramsFromPreset(key: PresetKey): ShaderParams {
 }
 
 export default function App() {
-  // Introduction page state (temporarily disabled)
-  const [showIntro, setShowIntro] = useState(false);
+  // Introduction landing screen state
+  const [showIntro, setShowIntro] = useState(true);
   const [audioMuted, setAudioMuted] = useState(true);
 
   // Core State
@@ -609,16 +609,12 @@ export default function App() {
 
   return (
     <>
-      {/* Session Introduction Gate Page (temporarily disabled) */}
+      {/* Session Introduction Landing Screen */}
       {showIntro && (
-        <IntroSessionGate
+        <CineStockIntro
           onEnterLab={() => {
             setShowIntro(false);
-            const labEl = document.getElementById('lab');
-            labEl?.scrollIntoView({ behavior: 'smooth' });
           }}
-          audioMuted={audioMuted}
-          onToggleAudio={handleToggleGlobalAudio}
         />
       )}
 
@@ -639,6 +635,15 @@ export default function App() {
           </b>
           <div className="flex items-center gap-4">
             <span>REC ● 24 STOCKS ONLINE</span>
+            <button
+              type="button"
+              onClick={() => setShowIntro(true)}
+              className="tag hidden sm:inline-flex items-center gap-1.5"
+              style={{ fontSize: '15px', padding: '4px 10px' }}
+              title="Return to Intro Landing Screen"
+            >
+              <span>INTRO</span>
+            </button>
             <button
               type="button"
               onClick={handleToggleGlobalAudio}
