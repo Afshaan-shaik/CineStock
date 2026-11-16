@@ -57,7 +57,7 @@ const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) => {
   const [isEntering, setIsEntering] = useState(false);
-  const [buttonText, setButtonText] = useState('Enter the lab');
+  const [buttonText, setButtonText] = useState('ENTER THE LAB');
 
   // Typewriter lines state
   const [labelTyped, setLabelTyped] = useState('');
@@ -69,14 +69,14 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
   const cassetteRef = useRef<HTMLDivElement | null>(null);
   const runTokenRef = useRef(0);
 
-  // Die-cut draggable stickers
+  // Die-cut draggable stickers positioned snuggly on cassette corners
   const [stickers, setStickers] = useState<StickerState[]>([
     {
       id: 'hi8',
       label: 'HI-8',
       color: '#f5a623',
       baseRotate: 8,
-      initialStyle: { top: '6%', right: 'calc(50% - min(260px, 45vw))' },
+      initialStyle: { top: '-10px', right: '-18px' },
       x: 0,
       y: 0,
     },
@@ -85,7 +85,7 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
       label: 'REC ●',
       color: '#ef4444',
       baseRotate: -9,
-      initialStyle: { bottom: '4%', left: 'calc(50% - min(250px, 44vw))' },
+      initialStyle: { bottom: '-10px', left: '-22px' },
       x: 0,
       y: 0,
     },
@@ -94,7 +94,7 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
       label: 'SP TAPE',
       color: '#35d0ba',
       baseRotate: 6,
-      initialStyle: { bottom: '-2%', right: 'calc(50% - min(210px, 38vw))' },
+      initialStyle: { bottom: '-8px', right: '-14px' },
       x: 0,
       y: 0,
     },
@@ -120,7 +120,7 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
 
     if (prefersReducedMotion) {
       setLabelTyped('Rewind the city - side A');
-      setKickTyped('[ ANALOG LAB v88 ]');
+      setKickTyped('[ ANALOG LAB V88 ]');
       setHeadlineTyped('REWIND THE CITY');
       setSubTyped(
         'Neon, tape hiss and rain on the lens. Add your footage and push it through twenty-four stocks in real time.'
@@ -204,9 +204,9 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
       );
       if (!ok1) return;
 
-      // 2. Kick line [ ANALOG LAB v88 ]
+      // 2. Kick line [ ANALOG LAB V88 ]
       const ok2 = await typeLine(
-        '[ ANALOG LAB v88 ]',
+        '[ ANALOG LAB V88 ]',
         setKickTyped,
         'kick',
         52,
@@ -244,8 +244,8 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
     // Mouse tilt tracking for the 3D cassette
     const handlePointerMove = (e: PointerEvent) => {
       if (!cassetteRef.current) return;
-      const rx = 8 - (e.clientY / window.innerHeight - 0.5) * 22;
-      const ry = -8 + (e.clientX / window.innerWidth - 0.5) * 32;
+      const rx = 8 - (e.clientY / window.innerHeight - 0.5) * 20;
+      const ry = -8 + (e.clientX / window.innerWidth - 0.5) * 28;
       cassetteRef.current.style.setProperty('--rx', `${rx.toFixed(2)}deg`);
       cassetteRef.current.style.setProperty('--ry', `${ry.toFixed(2)}deg`);
     };
@@ -277,7 +277,7 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
   const handleEnterLab = () => {
     if (isEntering) return;
     setIsEntering(true);
-    setButtonText('Loading reel...');
+    setButtonText('LOADING REEL...');
     try {
       retroAudio.playCassetteInsert();
     } catch {
@@ -330,16 +330,16 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
   };
 
   return (
-    <div className="c-intro-root fixed inset-0 z-50 overflow-hidden select-none flex flex-col justify-between">
+    <div className="c-intro-root fixed inset-0 z-50 overflow-hidden select-none flex items-center justify-center p-4 sm:p-6">
       {/* Blueprint Grid & Ambient Corner Amber Glow */}
       <div className="blueprint-backdrop absolute inset-0 pointer-events-none" />
 
       {/* Stepped Film Grain Noise Overlay */}
       <div className="film-grain-overlay absolute inset-0 pointer-events-none" />
 
-      {/* Header */}
-      <header className="relative z-20 flex justify-between items-center w-full px-6 sm:px-12 py-5 sm:py-6 shrink-0">
-        <div className="flex items-baseline">
+      {/* Fixed Top Header (Non-intruding) */}
+      <header className="fixed top-0 left-0 right-0 z-30 flex justify-between items-center w-full px-6 sm:px-12 py-5 sm:py-6 pointer-events-none">
+        <div className="pointer-events-auto flex items-baseline">
           <span className="font-['Space_Grotesk',sans-serif] font-bold text-lg sm:text-xl tracking-[0.2em] text-[#eaf4ff]">
             CINE
           </span>
@@ -348,19 +348,19 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
           </span>
         </div>
 
-        <div className="font-['Space_Mono',monospace] text-[11px] sm:text-xs tracking-[0.2em] text-[#8d9ab3] uppercase flex items-center gap-1.5">
+        <div className="pointer-events-auto font-['Space_Mono',monospace] text-[11px] sm:text-xs tracking-[0.2em] text-[#8d9ab3] uppercase flex items-center gap-1.5">
           <span>REC</span>
           <span className="text-[#ef4444] animate-pulse">●</span>
           <span>24 STOCKS ONLINE</span>
         </div>
       </header>
 
-      {/* Center Hero Stage (Perspective + 3D Cassette + Typography + CTA) */}
-      <main className="relative z-10 flex-1 flex flex-col items-center justify-center px-4 py-2 w-full max-w-[960px] mx-auto text-center">
-        {/* 3D Cassette Scene with Draggable Stickers and Masking Tape */}
-        <div className="relative w-full flex items-center justify-center h-[230px] sm:h-[280px] lg:h-[300px] mb-4 sm:mb-6">
+      {/* Dead-Center Hero Stage (Perspective + 3D Cassette + Typography + CTA) */}
+      <main className="stage relative z-10 flex flex-col items-center justify-center text-center w-full max-w-[880px] my-auto">
+        {/* 3D Cassette Scene with Attached Draggable Stickers & Masking Tape */}
+        <div className="relative flex items-center justify-center mb-5 sm:mb-7" style={{ width: 'min(440px, 82vw)' }}>
           {/* Cassette Floating Container */}
-          <div className="cassette-float-wrapper">
+          <div className="cassette-float-wrapper w-full">
             <div
               ref={cassetteRef}
               className={`cassette-shell ${isEntering ? 'reels-fast' : ''}`}
@@ -371,7 +371,7 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
               <i className="corner-screw bottom-[10px] left-[10px]" />
               <i className="corner-screw bottom-[10px] right-[10px]" />
 
-              {/* Cream Paper Label with Red Header Stripe & Writing Lines */}
+              {/* Cream Paper Label with Red Header Stripe & Faint Ruled Lines */}
               <div className="cassette-label">
                 <span className={`handwritten-label ${activeLine === 'label' ? 'has-caret' : ''}`}>
                   {labelTyped}
@@ -386,17 +386,17 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
             </div>
           </div>
 
-          {/* Masking Tape with Torn Zig-Zag Ends */}
+          {/* Masking Tape with Torn Zig-Zag Ends (Overlapping Top-Left of Cassette) */}
           <div
             className="masking-tape-strip pointer-events-none"
             style={{
-              top: '4%',
-              left: 'calc(50% - min(190px, 35vw))',
+              top: '-10px',
+              left: '12px',
               transform: 'rotate(-14deg)',
             }}
           />
 
-          {/* Three Die-Cut Draggable Stickers */}
+          {/* Three Die-Cut Draggable Stickers (Attached directly to cassette corners) */}
           {stickers.map((stk) => (
             <div
               key={stk.id}
@@ -417,10 +417,10 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
           ))}
         </div>
 
-        {/* Small Tag: [ ANALOG LAB v88 ] */}
+        {/* Small Tag: [ ANALOG LAB V88 ] */}
         <div className="h-6 flex items-center justify-center mb-2 sm:mb-3">
           <p
-            className={`font-['Space_Mono',monospace] text-[11px] sm:text-xs text-[#f5a623] tracking-[0.32em] uppercase font-bold ${
+            className={`font-['Space_Mono',monospace] text-[11px] sm:text-xs text-[#f5a623] tracking-[0.35em] uppercase font-bold ${
               activeLine === 'kick' ? 'has-caret' : ''
             }`}
           >
@@ -429,9 +429,9 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
         </div>
 
         {/* Headline: REWIND THE CITY (Space Grotesk bold, VHS RGB text shadow) */}
-        <div className="min-h-[44px] sm:min-h-[64px] lg:min-h-[82px] flex items-center justify-center mb-2 sm:mb-3">
+        <div className="min-h-[46px] sm:min-h-[68px] lg:min-h-[86px] flex items-center justify-center mb-2 sm:mb-3">
           <h1
-            className={`font-['Space_Grotesk',sans-serif] font-bold text-uppercase tracking-[-0.02em] leading-[0.95] text-[#eaf4ff] text-[clamp(38px,8vw,92px)] ${
+            className={`font-['Space_Grotesk',sans-serif] font-bold text-uppercase tracking-[-0.02em] leading-[0.95] text-[#eaf4ff] text-[clamp(40px,8.2vw,96px)] ${
               activeLine === 'headline' ? 'has-caret' : ''
             }`}
             style={{
@@ -443,7 +443,7 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
         </div>
 
         {/* Subtitle */}
-        <div className="min-h-[38px] sm:min-h-[46px] max-w-[540px] flex items-center justify-center px-4 mb-4 sm:mb-6">
+        <div className="min-h-[40px] sm:min-h-[48px] max-w-[530px] flex items-center justify-center px-4 mb-5 sm:mb-7">
           <p
             className={`font-['Space_Mono',monospace] text-xs sm:text-[14px] text-[#8d9ab3] leading-relaxed ${
               activeLine === 'sub' ? 'has-caret' : ''
@@ -453,22 +453,22 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
           </p>
         </div>
 
-        {/* "Enter the lab" Action Button */}
+        {/* "ENTER THE LAB" Action Button */}
         <div className="relative z-20">
           <button
             type="button"
             id="go"
             onClick={handleEnterLab}
             disabled={isEntering}
-            className="enter-lab-cta flex items-center justify-center font-['Space_Mono',monospace] font-bold text-xs sm:text-sm tracking-wider uppercase px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl text-[#111] transition-all duration-200 cursor-pointer active:scale-95 disabled:opacity-90"
+            className="enter-lab-cta flex items-center justify-center font-['Space_Mono',monospace] font-bold text-xs sm:text-sm tracking-wider uppercase px-8 sm:px-10 py-3.5 sm:py-4 rounded-xl text-[#111] transition-all duration-200 cursor-pointer active:scale-95 disabled:opacity-90"
           >
             {buttonText}
           </button>
         </div>
       </main>
 
-      {/* Footer / Replay Typing Button */}
-      <footer className="relative z-20 w-full px-6 py-4 flex justify-between items-center shrink-0">
+      {/* Fixed Bottom-Left Replay Typing Button */}
+      <div className="fixed bottom-4 sm:bottom-6 left-5 sm:left-8 z-30">
         <button
           type="button"
           onClick={runTypewriter}
@@ -477,11 +477,7 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
         >
           replay typing
         </button>
-
-        <span className="font-['Space_Mono',monospace] text-[10px] text-[#4d5770] tracking-widest hidden sm:inline">
-          CINESTOCK // NO.88 VHS ENGINE
-        </span>
-      </footer>
+      </div>
 
       {/* Embedded High-Fidelity CSS for 3D Cassette, Stickers & Typewriter Caret */}
       <style>{`
@@ -498,7 +494,7 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
           background:
             linear-gradient(rgba(27, 42, 64, 0.16) 1px, transparent 1px) 0 0 / 100% 98px,
             linear-gradient(90deg, rgba(27, 42, 64, 0.16) 1px, transparent 1px) 0 0 / 98px 100%,
-            radial-gradient(ellipse at 85% 82%, rgba(245, 166, 35, 0.16), transparent 55%);
+            radial-gradient(ellipse at 85% 82%, rgba(245, 166, 35, 0.18), transparent 55%);
         }
 
         /* Stepped Animated Film Grain Noise */
@@ -524,7 +520,7 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
         }
 
         .cassette-shell {
-          width: min(440px, 80vw);
+          width: 100%;
           aspect-ratio: 1.6;
           position: relative;
           border-radius: 16px;
@@ -566,7 +562,7 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
           position: absolute;
           left: 18px;
           right: 18px;
-          bottom: 15px;
+          bottom: 14px;
           height: 2px;
           background: rgba(42, 32, 24, 0.35);
           box-shadow: 0 -13px rgba(42, 32, 24, 0.22);
@@ -617,10 +613,10 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
         /* Torn Masking Tape Strip */
         .masking-tape-strip {
           position: absolute;
-          width: 118px;
-          height: 28px;
-          background: rgba(238, 222, 170, 0.84);
-          z-index: 4;
+          width: 120px;
+          height: 30px;
+          background: rgba(238, 222, 170, 0.86);
+          z-index: 6;
           box-shadow: 0 2px 6px rgba(0, 0, 0, 0.35);
           clip-path: polygon(
             0 0, 3% 12%, 0 25%, 3% 38%, 0 50%, 3% 62%, 0 75%, 3% 88%, 0 100%,
@@ -639,7 +635,7 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
           color: #111;
           border: 2px dashed rgba(0, 0, 0, 0.4);
           box-shadow: 0 0 0 3px #f4f4f0, 0 8px 16px rgba(0, 0, 0, 0.7);
-          z-index: 5;
+          z-index: 7;
           cursor: grab;
           touch-action: none;
           user-select: none;
@@ -659,7 +655,7 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
           height: 1em;
           margin-left: 3px;
           background: currentColor;
-          vertical-align: -0.12em;
+          vertical-align: -0.14em;
           animation: caret-blink 0.8s steps(1) infinite;
         }
 
@@ -667,15 +663,15 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
           50% { opacity: 0; }
         }
 
-        /* "Enter the lab" CTA */
+        /* "ENTER THE LAB" CTA */
         .enter-lab-cta {
           background: linear-gradient(90deg, #f5a623, #ef4444);
-          box-shadow: 0 0 34px rgba(245, 166, 35, 0.45), 0 8px 24px rgba(239, 68, 68, 0.3);
+          box-shadow: 0 0 36px 6px rgba(245, 166, 35, 0.38), 0 10px 24px rgba(239, 68, 68, 0.3);
         }
 
         .enter-lab-cta:hover {
           filter: brightness(1.15);
-          box-shadow: 0 0 46px rgba(245, 166, 35, 0.65), 0 12px 30px rgba(239, 68, 68, 0.45);
+          box-shadow: 0 0 48px 10px rgba(245, 166, 35, 0.55), 0 12px 30px rgba(239, 68, 68, 0.45);
           transform: translateY(-1px);
         }
 
