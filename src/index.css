@@ -1,0 +1,574 @@
+@import "tailwindcss";
+
+:root {
+  --bg: #05060d;
+  --fg: #e8f6ff;
+  --mu: #8aa0b4;
+  --ln: rgba(120, 220, 255, 0.16);
+  --pn: rgba(10, 14, 28, 0.78);
+  --sf: #0b1020;
+  --stage: #000;
+  --a: #22d3ee;
+  --b: #f0abfc;
+  --fb: 'Space Grotesk', system-ui, sans-serif;
+  --fd: 'Space Grotesk', system-ui, sans-serif;
+  --r: 8px;
+  --rp: 10px;
+  --rs: 6px;
+  --gr: 0.07;
+  --sh: 0 0 0 1px rgba(34, 211, 238, 0.08), 0 30px 80px -30px #000;
+  --cx: 50vw;
+  --cy: 35vh;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+}
+
+html {
+  scroll-padding-top: env(safe-area-inset-top, 0px);
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font: 400 16px/1.65 var(--fb);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  background-image:
+    linear-gradient(var(--ln) 1px, transparent 1px),
+    linear-gradient(90deg, var(--ln) 1px, transparent 1px);
+  background-size: 72px 72px;
+  background-attachment: fixed;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    640px circle at var(--cx, 50vw) var(--cy, 30vh),
+    color-mix(in srgb, var(--a) 14%, transparent),
+    transparent 70%
+  );
+}
+
+.grain {
+  position: fixed;
+  inset: -50%;
+  z-index: 60;
+  pointer-events: none;
+  opacity: var(--gr, 0.07);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: g 0.9s steps(6) infinite;
+}
+
+@keyframes g {
+  0% { transform: translate(0, 0); }
+  25% { transform: translate(-3%, 2%); }
+  50% { transform: translate(2%, -4%); }
+  75% { transform: translate(-4%, -1%); }
+  100% { transform: translate(0, 0); }
+}
+
+#bk {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  width: 100%;
+  height: 100%;
+}
+
+.wrap {
+  position: relative;
+  z-index: 2;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  border: 1px solid var(--ln);
+  cursor: pointer;
+  font: 500 14px var(--fb);
+  color: var(--fg);
+  background: var(--pn);
+  padding: 12px 22px;
+  border-radius: var(--r);
+  transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+  backdrop-filter: blur(14px);
+  letter-spacing: 0.06em;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  border-color: var(--a);
+}
+
+.btn.pri {
+  border: 0;
+  color: var(--onA, #0a0a0a);
+  font-weight: 600;
+  background: linear-gradient(135deg, var(--a), var(--b));
+  box-shadow: 0 12px 40px -10px var(--a);
+}
+
+.btn.big {
+  padding: 20px 44px;
+  font-size: 16px;
+}
+
+.btn[aria-pressed="true"] {
+  border-color: var(--a);
+  background: color-mix(in srgb, var(--a) 20%, transparent);
+}
+
+.btn:focus-visible,
+.chip:focus-visible,
+.tag:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--a);
+  outline-offset: 3px;
+}
+
+.ibtn {
+  width: 44px;
+  height: 44px;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 50%;
+}
+
+.bar {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pn {
+  background: var(--pn);
+  border: 1px solid var(--ln);
+  border-radius: var(--rp, 26px);
+  backdrop-filter: blur(20px);
+  box-shadow: var(--sh, 0 30px 80px -26px rgba(0, 0, 0, 0.6));
+}
+
+.screen {
+  position: relative;
+  background: var(--stage);
+  border-radius: var(--rs, 14px);
+  min-height: 360px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  transition: box-shadow 0.3s;
+}
+
+.screen.over {
+  box-shadow: 0 0 0 2px var(--a), 0 0 80px -10px var(--a);
+}
+
+canvas#out {
+  max-width: 100%;
+  max-height: 70vh;
+  display: block;
+  touch-action: none;
+}
+
+.split {
+  position: absolute;
+  top: 0;
+  width: 2px;
+  background: #fff;
+  cursor: ew-resize;
+  box-shadow: 0 0 12px #fff;
+}
+
+.split::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: -13px;
+  width: 28px;
+  height: 28px;
+  margin-top: -14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 3px solid #111;
+}
+
+.cmpl {
+  position: absolute;
+  font: 20px 'VT323', monospace;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.55);
+  padding: 1px 10px;
+  border-radius: 9px;
+}
+
+.tbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 18px;
+  flex-wrap: wrap;
+}
+
+.tbar input {
+  flex: 1;
+  min-width: 120px;
+}
+
+.tc {
+  font: 20px 'VT323', monospace;
+  color: var(--mu);
+  min-width: 112px;
+  text-align: right;
+}
+
+.row2 {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  align-items: center;
+}
+
+.row2 small {
+  color: var(--mu);
+  margin-right: 4px;
+}
+
+.tag {
+  border: 1px solid var(--ln);
+  background: transparent;
+  color: var(--mu);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font: 500 13px var(--fb);
+  cursor: pointer;
+  transition: 0.2s;
+  letter-spacing: 0.06em;
+}
+
+.tag:hover {
+  color: var(--fg);
+}
+
+.tag[aria-pressed="true"] {
+  color: var(--bg);
+  background: var(--fg);
+  border-color: var(--fg);
+}
+
+.cats {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin: 14px 0;
+}
+
+.chips {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 9px;
+  max-height: 58vh;
+  overflow: auto;
+  padding: 3px;
+}
+
+.chip {
+  text-align: left;
+  border: 1px solid var(--ln);
+  background: transparent;
+  color: var(--fg);
+  border-radius: calc(var(--r) * 0.6);
+  padding: 11px 12px;
+  cursor: pointer;
+  font: 500 13px/1.3 var(--fb);
+  transition: transform 0.2s, border-color 0.2s, background 0.2s;
+}
+
+.chip i {
+  display: block;
+  height: 5px;
+  border-radius: 5px;
+  margin-bottom: 9px;
+}
+
+.chip small {
+  display: block;
+  color: var(--mu);
+  font-weight: 400;
+  font-size: 11.5px;
+  margin-top: 2px;
+}
+
+.chip:hover {
+  transform: translateY(-2px);
+}
+
+.chip[aria-pressed="true"] {
+  border-color: var(--ca);
+  background: color-mix(in srgb, var(--ca) 15%, transparent);
+}
+
+.sl {
+  margin-bottom: 17px;
+  font-size: 13.5px;
+}
+
+.sl div {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 7px;
+}
+
+.sl output {
+  color: var(--mu);
+  font-variant-numeric: tabular-nums;
+}
+
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 5px;
+  border-radius: 9px;
+  background: var(--ln);
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #111;
+  box-shadow: 0 0 0 1.5px var(--tc, var(--a)), 0 0 14px var(--tc, var(--a));
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid #111;
+}
+
+.tg {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+  font-size: 14px;
+  margin-top: 14px;
+}
+
+.tg label {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  cursor: pointer;
+}
+
+.tg input {
+  accent-color: var(--a);
+  width: 17px;
+  height: 17px;
+}
+
+.sub {
+  color: var(--mu);
+  font-size: 13.5px;
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  background: rgba(5, 3, 10, 0.72);
+  backdrop-filter: blur(10px);
+  display: none;
+  place-items: center;
+  padding: 24px;
+}
+
+.modal.on {
+  display: grid;
+}
+
+.modal .pn {
+  max-width: 460px;
+  width: 100%;
+  padding: 34px;
+  text-align: center;
+  background: var(--sf);
+}
+
+.modal h3 {
+  font: 500 30px var(--fd);
+  margin-bottom: 8px;
+}
+
+.modal p {
+  color: var(--mu);
+  margin-bottom: 22px;
+}
+
+.pg {
+  height: 4px;
+  background: var(--ln);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 22px;
+}
+
+.pg div {
+  height: 100%;
+  width: 0;
+  background: linear-gradient(90deg, var(--a), var(--b));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain { animation: none; }
+  html { scroll-behavior: auto; }
+}
+
+/* Tokyo Night Navigation */
+nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 30px clamp(22px, 4vw, 64px);
+  font: 20px 'VT323', monospace;
+  letter-spacing: 0.12em;
+  color: var(--mu);
+}
+
+nav b {
+  color: var(--fg);
+  font-weight: 700;
+  font-family: var(--fb);
+  font-size: 20px;
+  letter-spacing: 0.2em;
+}
+
+nav b i {
+  color: var(--a);
+  font-style: normal;
+}
+
+/* Tokyo Night Hero */
+.hero {
+  padding: clamp(60px, 14vh, 180px) clamp(22px, 4vw, 64px) 100px;
+  max-width: 1700px;
+  margin: 0 auto;
+}
+
+.hero small {
+  font: 22px 'VT323', monospace;
+  color: var(--a);
+  letter-spacing: 0.3em;
+}
+
+.hero h1 {
+  font: 700 clamp(54px, 12vw, 190px)/0.9 var(--fb);
+  letter-spacing: -0.05em;
+  text-transform: uppercase;
+  margin: 24px 0 38px;
+  text-shadow: 3px 0 var(--b), -3px 0 var(--a);
+}
+
+.hero p {
+  max-width: 34em;
+  color: var(--mu);
+  font-size: 19px;
+  margin-bottom: 50px;
+}
+
+/* Tokyo Night Marquee */
+.mq {
+  overflow: hidden;
+  white-space: nowrap;
+  border-block: 1px solid var(--ln);
+  padding: 16px 0;
+  font: 22px 'VT323', monospace;
+  letter-spacing: 0.3em;
+  color: var(--mu);
+}
+
+.mq div {
+  display: inline-block;
+  animation: mq 40s linear infinite;
+}
+
+@keyframes mq {
+  to { transform: translateX(-50%); }
+}
+
+/* Tokyo Night 3-Column Lab Grid */
+.lab {
+  padding: clamp(50px, 9vh, 120px) clamp(16px, 3vw, 48px);
+  max-width: 1800px;
+  margin: 0 auto;
+}
+
+.lab .bar {
+  margin-bottom: 28px;
+}
+
+.tk {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr) 340px;
+  gap: clamp(16px, 2vw, 32px);
+  align-items: start;
+}
+
+.tk .pn {
+  padding: 24px;
+}
+
+.rail {
+  position: sticky;
+  top: 16px;
+}
+
+.h3 {
+  font: 26px 'VT323', monospace;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--a);
+  margin-bottom: 4px;
+}
+
+.ctr .pn {
+  padding: 16px;
+}
+
+footer {
+  text-align: center;
+  padding: 100px 24px;
+  font: 22px 'VT323', monospace;
+  letter-spacing: 0.3em;
+  color: var(--mu);
+}
+
+@media (max-width: 1200px) {
+  .tk {
+    grid-template-columns: 1fr;
+  }
+  .rail {
+    position: static;
+  }
+  .chips {
+    grid-template-columns: 1fr 1fr;
+    max-height: 340px;
+  }
+}

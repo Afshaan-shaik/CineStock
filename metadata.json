@@ -1,0 +1,8 @@
+{
+  "name": "Nocturne 88",
+  "description": "Real-time WebGL analog VHS, Super 8, and dream film lab for video and photography.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
