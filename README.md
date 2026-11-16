@@ -2,6 +2,8 @@
 
 A real-time WebGL analog film, VHS, and dream camcorder emulation darkroom built with React, TypeScript, and custom GLSL fragment shaders.
 
+**Live Deployment:** [https://cinnestock.vercel.app](https://cinnestock.vercel.app)
+
 ![CineStock Preview](https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80)
 
 ## Features
