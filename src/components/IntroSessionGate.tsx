@@ -86,7 +86,7 @@ export const IntroSessionGate: React.FC<IntroSessionGateProps> = ({
           className="font-['Space_Grotesk',sans-serif] text-5xl sm:text-7xl font-bold tracking-tight uppercase mb-4 text-[#e8f6ff]"
           style={{ textShadow: '3px 0 var(--b), -3px 0 var(--a)' }}
         >
-          Nostalgia<span style={{ color: 'var(--a)' }}>.co</span>
+          Cine<span style={{ color: 'var(--a)' }}>Stock</span>
         </h1>
 
         <p className="font-['Space_Grotesk',sans-serif] text-sm sm:text-base text-[var(--mu)] max-w-md mb-8">
@@ -107,7 +107,7 @@ export const IntroSessionGate: React.FC<IntroSessionGateProps> = ({
             <div className="flex justify-between items-start">
               <div>
                 <p className="font-['VT323',monospace] text-2xl font-bold tracking-wider text-[var(--a)] leading-none">
-                  NOSTALGIA.CO // TAPE #88
+                  CINESTOCK // TAPE #88
                 </p>
                 <p className="font-mono text-[10px] text-[var(--mu)] tracking-widest uppercase mt-0.5">
                   TOKYO NIGHT · 24 ANALOG STOCKS

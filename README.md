@@ -1,8 +1,8 @@
-# Nostalgia.Co — Tokyo Night Analog VHS & Film Lab
+# CineStock — Tokyo Night Analog VHS & Film Lab
 
 A real-time WebGL analog film, VHS, and dream camcorder emulation darkroom built with React, TypeScript, and custom GLSL fragment shaders.
 
-![Nostalgia.Co Preview](https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80)
+![CineStock Preview](https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1200&q=80)
 
 ## Features
 
@@ -22,7 +22,7 @@ A real-time WebGL analog film, VHS, and dream camcorder emulation darkroom built
   - *Lambo / Bugatti Drive:* High-speed supercar road drive.
   - *Famous Person:* Marilyn Monroe in 1950s golden age Hollywood cinema.
 - **Interactive Tools & Stage:**
-  - Draggable Before / After split-screen slider (`ORIGINAL` vs `NOSTALGIA`).
+  - Draggable Before / After split-screen slider (`ORIGINAL` vs `CINESTOCK`).
   - Camcorder OSD deck with live timestamp, 24 fps cinema cadence, and custom typo/title generator.
   - MediaRecorder reel export (WebM/MP4) and instant high-res PNG snapshot capture.
   - Ambient cursor-tracking bokeh light trail and analog audio synthesizer.
@@ -37,8 +37,8 @@ A real-time WebGL analog film, VHS, and dream camcorder emulation darkroom built
 
 ```bash
 # Clone the repository
-git clone https://github.com/Afshaan-shaik/Nostalgia.Co.git
-cd Nostalgia.Co
+git clone https://github.com/Afshaan-shaik/CineStock.git
+cd CineStock
 
 # Install dependencies
 npm install --legacy-peer-deps

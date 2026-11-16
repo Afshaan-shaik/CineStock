@@ -74,7 +74,7 @@ export default function App() {
   const [exportStatusText, setExportStatusText] = useState('Initializing encoder…');
   const [exportErrorText, setExportErrorText] = useState<string | null>(null);
   const [downloadUrl, setDownloadUrl] = useState<string | null>(null);
-  const [downloadFilename, setDownloadFilename] = useState('nostalgia-vhs94.webm');
+  const [downloadFilename, setDownloadFilename] = useState('cinestock-vhs94.webm');
 
   const outputCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
@@ -445,7 +445,7 @@ export default function App() {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `nostalgia-${activePreset}.png`;
+        a.download = `cinestock-${activePreset}.png`;
         a.click();
         setTimeout(() => URL.revokeObjectURL(url), 1000);
         renderSingleFrame(compareSplit);
@@ -535,7 +535,7 @@ export default function App() {
       exportUrlRef.current = url;
 
       setDownloadUrl(url);
-      setDownloadFilename(`nostalgia-${activePreset}.${ext}`);
+      setDownloadFilename(`cinestock-${activePreset}.${ext}`);
       setExportStatusText(`${(blob.size / (1024 * 1024)).toFixed(2)} MB · ${ext.toUpperCase()}`);
       setExportProgress(100);
       setExportComplete(true);
@@ -635,7 +635,7 @@ export default function App() {
         {/* Navigation */}
         <nav>
           <b>
-            NOSTALGIA<i>.CO</i>
+            CINE<i>STOCK</i>
           </b>
           <div className="flex items-center gap-4">
             <span>REC ● 24 STOCKS ONLINE</span>
@@ -815,7 +815,7 @@ export default function App() {
         </section>
 
         {/* Footer */}
-        <footer>NOSTALGIA.CO — PLAY ►</footer>
+        <footer>CINESTOCK — PLAY ►</footer>
       </div>
 
       {/* Export Progress & Download Modal */}

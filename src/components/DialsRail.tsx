@@ -30,7 +30,7 @@ const DIALS: {
   { key: 'tracking', label: 'VHS tracking & gate weave', min: 0, max: 1, step: 0.01, thumbColor: '#f59e0b' },
   { key: 'grain', label: 'Analog grain & dust', min: 0, max: 1, step: 0.01, thumbColor: '#a78bfa' },
   { key: 'scanlines', label: 'CRT scanlines', min: 0, max: 1, step: 0.01, thumbColor: '#34d399' },
-  { key: 'fade', label: 'Matte fade & nostalgia', min: 0, max: 1, step: 0.01, thumbColor: '#fbbf24' },
+  { key: 'fade', label: 'Matte fade & film tone', min: 0, max: 1, step: 0.01, thumbColor: '#fbbf24' },
   { key: 'warmth', label: 'Warmth & split tone', min: -1, max: 1, step: 0.01, thumbColor: '#fb7185' },
   { key: 'vignette', label: 'Optical vignette', min: 0, max: 1, step: 0.01, thumbColor: '#818cf8' },
 ];

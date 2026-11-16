@@ -154,7 +154,7 @@ export const MonitorStage: React.FC<MonitorStageProps> = ({
                 style={{ display: 'block', top: '12px', right: '12px' }}
                 className="cmpl"
               >
-                NOSTALGIA
+                CINESTOCK
               </span>
             </>
           )}
