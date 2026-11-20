@@ -15,6 +15,7 @@ interface DialsRailProps {
   onToggleCinema24fps: (enabled: boolean) => void;
   osdDate: string;
   onRandomizeDate: () => void;
+  layout?: 'rail' | 'grid2';
 }
 
 const DIALS: {
@@ -44,7 +45,97 @@ export const DialsRail: React.FC<DialsRailProps> = ({
   onToggleCinema24fps,
   osdDate,
   onRandomizeDate,
+  layout = 'rail',
 }) => {
+  if (layout === 'grid2') {
+    return (
+      <div className="pn p-5 w-full">
+        <h3 className="h3">Dials</h3>
+        <p className="sub" style={{ marginBottom: '18px' }}>
+          Every stock is only a starting point.
+        </p>
+
+        {/* 2-Column Grid of Dials */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4 mb-6">
+          {DIALS.map((d) => {
+            const val = params[d.key];
+            return (
+              <div key={d.key} className="sl mb-0">
+                <div className="flex justify-between items-center mb-1">
+                  <label htmlFor={`g2-${d.key}`} className="text-xs font-medium text-white/90">
+                    {d.label}
+                  </label>
+                  <output id={`og2-${d.key}`} className="text-xs font-mono text-[var(--mu)] tabular-nums">
+                    {val.toFixed(2)}
+                  </output>
+                </div>
+                <input
+                  type="range"
+                  id={`g2-${d.key}`}
+                  min={d.min}
+                  max={d.max}
+                  step={d.step}
+                  value={val}
+                  style={{ ['--tc' as string]: d.thumbColor }}
+                  onChange={(e) => onChangeParam(d.key, parseFloat(e.target.value))}
+                  className="w-full h-2 rounded-lg bg-[var(--ln)] cursor-pointer"
+                />
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Camcorder Deck Side-by-Side */}
+        <div className="pt-4 border-t border-[var(--ln)]">
+          <h3 className="h3">Camcorder deck</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-3">
+            <div className="tg mt-0 space-y-2.5">
+              <label className="flex items-center gap-2.5 cursor-pointer text-xs">
+                <input
+                  type="checkbox"
+                  checked={osdEnabled}
+                  onChange={(e) => {
+                    retroAudio.playCamcorderBeep();
+                    onToggleOsd(e.target.checked);
+                  }}
+                  className="w-4 h-4 accent-[#f59e0b] rounded"
+                />{' '}
+                Date stamp and REC overlay
+              </label>
+              <label className="flex items-center gap-2.5 cursor-pointer text-xs">
+                <input
+                  type="checkbox"
+                  checked={cinema24fps}
+                  onChange={(e) => {
+                    retroAudio.playClick();
+                    onToggleCinema24fps(e.target.checked);
+                  }}
+                  className="w-4 h-4 accent-[#f59e0b] rounded"
+                />{' '}
+                24 fps cinema cadence
+              </label>
+            </div>
+
+            <div className="flex items-center justify-between p-3 rounded-xl bg-black/40 border border-[var(--ln)]">
+              <small className="font-mono text-xs text-[var(--mu)] flex items-center gap-1.5">
+                <Calendar className="w-4 h-4 text-[#f59e0b]" />
+                <span>Stamp date: {osdDate}</span>
+              </small>
+              <button
+                type="button"
+                onClick={onRandomizeDate}
+                className="tag text-xs"
+              >
+                New date
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Standard vertical rail for Desktop and Tablet Landscape
   return (
     <aside className="pn rail">
       <div>
@@ -122,4 +213,3 @@ export const DialsRail: React.FC<DialsRailProps> = ({
     </aside>
   );
 };
-

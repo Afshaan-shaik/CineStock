@@ -7,6 +7,8 @@ import { ExportModal } from './components/ExportModal';
 import { MarqueeBanner } from './components/MarqueeBanner';
 import { MonitorStage } from './components/MonitorStage';
 import { StockRail } from './components/StockRail';
+import { MobileSnapSheet } from './components/MobileSnapSheet';
+import { TabletStudioDock } from './components/TabletStudioDock';
 import { drawOSDOverlay, formatTimecode, renderDemoFrame } from './engine/demoReels';
 import { retroAudio } from './engine/audioSynthesizer';
 import { WebGLFilmPipeline } from './engine/webglPipeline';
@@ -44,9 +46,39 @@ function paramsFromPreset(key: PresetKey): ShaderParams {
   };
 }
 
+function useMediaQuery(query: string): boolean {
+  const [matches, setMatches] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return window.matchMedia(query).matches;
+  });
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const m = window.matchMedia(query);
+    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
+    setMatches(m.matches);
+    m.addEventListener('change', handler);
+    return () => m.removeEventListener('change', handler);
+  }, [query]);
+
+  return matches;
+}
+
 export default function App() {
-  // Introduction landing screen state
-  const [showIntro, setShowIntro] = useState(true);
+  // Responsive Breakpoints
+  const isPhone = useMediaQuery('(max-width: 767px)');
+  const isTabletPortrait = useMediaQuery('(min-width: 768px) and (max-width: 1023px)');
+
+  // Introduction landing screen state (supports ?intro=false for direct lab view)
+  const [showIntro, setShowIntro] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const sp = new URLSearchParams(window.location.search);
+      if (sp.get('intro') === 'false' || window.location.hash === '#lab') {
+        return false;
+      }
+    }
+    return true;
+  });
   const [audioMuted, setAudioMuted] = useState(true);
 
   // Core State
@@ -629,17 +661,21 @@ export default function App() {
 
       <div className="wrap">
         {/* Navigation */}
-        <nav>
-          <b>
+        <nav className="flex justify-between items-center px-4 sm:px-8 lg:px-14 py-4 sm:py-6">
+          <b className="text-base sm:text-xl font-bold tracking-[0.2em] select-none">
             CINE<i>STOCK</i>
           </b>
-          <div className="flex items-center gap-4">
-            <span>REC ● 24 STOCKS ONLINE</span>
+          <div className="flex items-center gap-2 sm:gap-4 text-xs sm:text-base font-mono">
+            <span className="text-[var(--mu)] hidden min-[440px]:inline">
+              REC <span className="text-red-400">●</span> {isPhone ? '24 STOCKS' : '24 STOCKS ONLINE'}
+            </span>
+            <span className="text-red-400 min-[440px]:hidden text-sm">
+              REC ●
+            </span>
             <button
               type="button"
               onClick={() => setShowIntro(true)}
-              className="tag hidden sm:inline-flex items-center gap-1.5"
-              style={{ fontSize: '15px', padding: '4px 10px' }}
+              className="tag inline-flex items-center justify-center gap-1 min-h-[38px] px-2.5 sm:px-3 text-xs sm:text-sm"
               title="Return to Intro Landing Screen"
             >
               <span>INTRO</span>
@@ -647,12 +683,11 @@ export default function App() {
             <button
               type="button"
               onClick={handleToggleGlobalAudio}
-              className="tag hidden sm:inline-flex items-center gap-1.5"
-              style={{ fontSize: '15px', padding: '4px 10px' }}
+              className="tag inline-flex items-center justify-center gap-1 min-h-[38px] px-2.5 sm:px-3 text-xs sm:text-sm"
               title={audioMuted ? 'Turn Sound FX ON' : 'Turn Sound FX OFF'}
             >
               {audioMuted ? <VolumeX className="w-3.5 h-3.5 text-red-400" /> : <Volume2 className="w-3.5 h-3.5 text-[var(--a)]" />}
-              <span>{audioMuted ? 'MUTE' : 'AUDIO'}</span>
+              <span className="hidden min-[380px]:inline">{audioMuted ? 'MUTE' : 'AUDIO'}</span>
             </button>
           </div>
         </nav>
@@ -669,7 +704,7 @@ export default function App() {
             Neon, tape hiss and rain on the lens. Add your footage and push it through twenty-four
             stocks in real time.
           </p>
-          <div className="flex items-center gap-4 flex-wrap">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 sm:gap-4 max-w-md sm:max-w-none">
             <button
               type="button"
               id="go"
@@ -677,7 +712,7 @@ export default function App() {
                 retroAudio.playClick();
                 document.getElementById('lab')?.scrollIntoView({ behavior: 'smooth' });
               }}
-              className="btn pri big"
+              className="btn pri big text-center justify-center"
             >
               Load a tape
             </button>
@@ -687,7 +722,7 @@ export default function App() {
                 retroAudio.playClick();
                 fileInputRef.current?.click();
               }}
-              className="btn big"
+              className="btn big text-center justify-center"
             >
               <Upload className="w-4 h-4 text-[var(--a)] mr-1" />
               Upload file
@@ -698,125 +733,256 @@ export default function App() {
         {/* Marquee Banner */}
         <MarqueeBanner />
 
-        {/* The 3-Column Darkroom Lab Section */}
+        {/* Studio Darkroom Lab Section */}
         <section className="lab" id="lab">
-          {/* Action Toolbar */}
-          <div className="bar">
-            <input
-              ref={fileInputRef}
-              type="file"
-              id="file"
-              accept="video/*,image/*"
-              hidden
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) loadUserMedia(file);
-                e.target.value = '';
-              }}
-            />
+          {/* Action Toolbar File Input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            id="file"
+            accept="video/*,image/*"
+            hidden
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) loadUserMedia(file);
+              e.target.value = '';
+            }}
+          />
 
-            <button
-              type="button"
-              id="add"
-              onClick={() => {
-                retroAudio.playClick();
-                fileInputRef.current?.click();
-              }}
-              className="btn"
-            >
-              <Upload className="w-4 h-4 text-[var(--a)]" />
-              Add video / photo
-            </button>
+          {isPhone ? (
+            /* =========================================================
+               PHONES (<768px): Viewfinder + Snap Sheet Layout
+               ========================================================= */
+            <div className="phone-lab-layout w-full">
+              {/* Sticky Top Viewfinder Stage */}
+              <MonitorStage
+                canvasRef={outputCanvasRef}
+                aspect={aspect}
+                onAspectChange={setAspect}
+                compareSplit={compareSplit}
+                splitPos={splitPos}
+                onSplitPosChange={setSplitPos}
+                isPlaying={isPlaying}
+                onTogglePlay={handleTogglePlay}
+                sourceType={sourceType}
+                demoMode={demoMode}
+                onSelectDemo={handleSelectDemo}
+                seekPercent={seekPercent}
+                onSeek={handleSeek}
+                timecodeText={timecodeText}
+                isMuted={isMuted}
+                onToggleMute={handleToggleMute}
+                onFileDrop={loadUserMedia}
+                customCaption={customCaption}
+                onChangeCustomCaption={setCustomCaption}
+                showSubControls={false}
+                className="phone-viewfinder"
+              />
 
-            <button
-              type="button"
-              id="cmp"
-              onClick={() => {
-                retroAudio.playClick();
-                setCompareSplit((prev) => !prev);
-              }}
-              aria-pressed={compareSplit}
-              className="btn"
-            >
-              <Columns2 className="w-4 h-4 text-[var(--b)]" />
-              Before / after
-            </button>
+              {/* Bottom Snap Sheet with 3 Snap Points (Peek/Half/Full) & 4 Tabs */}
+              <MobileSnapSheet
+                activePreset={activePreset}
+                onSelectPreset={handleSelectPreset}
+                onSurpriseStock={handleSurpriseStock}
+                params={params}
+                onChangeParam={handleParamChange}
+                osdEnabled={osdEnabled}
+                onToggleOsd={setOsdEnabled}
+                cinema24fps={cinema24fps}
+                onToggleCinema24fps={setCinema24fps}
+                osdDate={osdDate}
+                onRandomizeDate={handleRandomizeDate}
+                customCaption={customCaption}
+                onChangeCustomCaption={setCustomCaption}
+                aspect={aspect}
+                onAspectChange={setAspect}
+                demoMode={demoMode}
+                onSelectDemo={handleSelectDemo}
+                sourceType={sourceType}
+                compareSplit={compareSplit}
+                onToggleCompareSplit={() => setCompareSplit((prev) => !prev)}
+                onReset={handleReset}
+                onExport={handleExport}
+                onAddFile={() => fileInputRef.current?.click()}
+                accentColor={currentStock.accent}
+                accentSecondary={currentStock.accentSecondary}
+              />
+            </div>
+          ) : isTabletPortrait ? (
+            /* =========================================================
+               TABLET PORTRAIT (768px - 1023px): Tablet Studio Portrait
+               ========================================================= */
+            <div className="tablet-portrait-layout space-y-6 w-full max-w-[920px] mx-auto pb-24">
+              {/* Sticky Stage on Top */}
+              <MonitorStage
+                canvasRef={outputCanvasRef}
+                aspect={aspect}
+                onAspectChange={setAspect}
+                compareSplit={compareSplit}
+                splitPos={splitPos}
+                onSplitPosChange={setSplitPos}
+                isPlaying={isPlaying}
+                onTogglePlay={handleTogglePlay}
+                sourceType={sourceType}
+                demoMode={demoMode}
+                onSelectDemo={handleSelectDemo}
+                seekPercent={seekPercent}
+                onSeek={handleSeek}
+                timecodeText={timecodeText}
+                isMuted={isMuted}
+                onToggleMute={handleToggleMute}
+                onFileDrop={loadUserMedia}
+                customCaption={customCaption}
+                onChangeCustomCaption={setCustomCaption}
+                showSubControls={true}
+                className="tablet-portrait-stage"
+              />
 
-            <button
-              type="button"
-              id="sur"
-              onClick={handleSurpriseStock}
-              className="btn"
-            >
-              <Sparkles className="w-4 h-4 text-[var(--a)]" />
-              Surprise me
-            </button>
+              {/* Film Stocks Horizontal Canister Carousel */}
+              <StockRail
+                activePreset={activePreset}
+                onSelectPreset={handleSelectPreset}
+                onSurpriseStock={handleSurpriseStock}
+                layout="carousel"
+              />
 
-            <button
-              type="button"
-              id="rst"
-              onClick={handleReset}
-              className="btn"
-            >
-              <RotateCcw className="w-4 h-4" />
-              Reset
-            </button>
+              {/* Dials in 2-Column Grid */}
+              <DialsRail
+                params={params}
+                onChangeParam={handleParamChange}
+                osdEnabled={osdEnabled}
+                onToggleOsd={setOsdEnabled}
+                cinema24fps={cinema24fps}
+                onToggleCinema24fps={setCinema24fps}
+                osdDate={osdDate}
+                onRandomizeDate={handleRandomizeDate}
+                layout="grid2"
+              />
 
-            <button
-              type="button"
-              id="exp"
-              onClick={handleExport}
-              className="btn pri ml-auto"
-            >
-              <Download className="w-4 h-4" />
-              {sourceType === 'image' ? 'Export PNG' : 'Export reel'}
-            </button>
-          </div>
+              {/* Floating Glass Action Dock */}
+              <TabletStudioDock
+                compareSplit={compareSplit}
+                onToggleCompareSplit={() => setCompareSplit((prev) => !prev)}
+                onSurpriseStock={handleSurpriseStock}
+                onAddFile={() => fileInputRef.current?.click()}
+                onExport={handleExport}
+                sourceType={sourceType}
+              />
+            </div>
+          ) : (
+            /* =========================================================
+               TABLET LANDSCAPE (>=1024px) & DESKTOP (>1366px): 3-Column
+               ========================================================= */
+            <>
+              {/* Action Toolbar */}
+              <div className="bar">
+                <button
+                  type="button"
+                  id="add"
+                  onClick={() => {
+                    retroAudio.playClick();
+                    fileInputRef.current?.click();
+                  }}
+                  className="btn"
+                >
+                  <Upload className="w-4 h-4 text-[var(--a)]" />
+                  Add video / photo
+                </button>
 
-          {/* 3-Column Tokyo Grid */}
-          <div className="tk">
-            {/* Left Rail: Film Stocks */}
-            <StockRail
-              activePreset={activePreset}
-              onSelectPreset={handleSelectPreset}
-              onSurpriseStock={handleSurpriseStock}
-            />
+                <button
+                  type="button"
+                  id="cmp"
+                  onClick={() => {
+                    retroAudio.playClick();
+                    setCompareSplit((prev) => !prev);
+                  }}
+                  aria-pressed={compareSplit}
+                  className="btn"
+                >
+                  <Columns2 className="w-4 h-4 text-[var(--b)]" />
+                  Before / after
+                </button>
 
-            {/* Center: Stage Monitor */}
-            <MonitorStage
-              canvasRef={outputCanvasRef}
-              aspect={aspect}
-              onAspectChange={setAspect}
-              compareSplit={compareSplit}
-              splitPos={splitPos}
-              onSplitPosChange={setSplitPos}
-              isPlaying={isPlaying}
-              onTogglePlay={handleTogglePlay}
-              sourceType={sourceType}
-              demoMode={demoMode}
-              onSelectDemo={handleSelectDemo}
-              seekPercent={seekPercent}
-              onSeek={handleSeek}
-              timecodeText={timecodeText}
-              isMuted={isMuted}
-              onToggleMute={handleToggleMute}
-              onFileDrop={loadUserMedia}
-              customCaption={customCaption}
-              onChangeCustomCaption={setCustomCaption}
-            />
+                <button
+                  type="button"
+                  id="sur"
+                  onClick={handleSurpriseStock}
+                  className="btn"
+                >
+                  <Sparkles className="w-4 h-4 text-[var(--a)]" />
+                  Surprise me
+                </button>
 
-            {/* Right Rail: Dials & Camcorder Deck */}
-            <DialsRail
-              params={params}
-              onChangeParam={handleParamChange}
-              osdEnabled={osdEnabled}
-              onToggleOsd={setOsdEnabled}
-              cinema24fps={cinema24fps}
-              onToggleCinema24fps={setCinema24fps}
-              osdDate={osdDate}
-              onRandomizeDate={handleRandomizeDate}
-            />
-          </div>
+                <button
+                  type="button"
+                  id="rst"
+                  onClick={handleReset}
+                  className="btn"
+                >
+                  <RotateCcw className="w-4 h-4" />
+                  Reset
+                </button>
+
+                <button
+                  type="button"
+                  id="exp"
+                  onClick={handleExport}
+                  className="btn pri ml-auto"
+                >
+                  <Download className="w-4 h-4" />
+                  {sourceType === 'image' ? 'Export PNG' : 'Export reel'}
+                </button>
+              </div>
+
+              {/* 3-Column Tokyo Grid */}
+              <div className="tk">
+                {/* Left Rail: Film Stocks */}
+                <StockRail
+                  activePreset={activePreset}
+                  onSelectPreset={handleSelectPreset}
+                  onSurpriseStock={handleSurpriseStock}
+                  layout="rail"
+                />
+
+                {/* Center: Stage Monitor */}
+                <MonitorStage
+                  canvasRef={outputCanvasRef}
+                  aspect={aspect}
+                  onAspectChange={setAspect}
+                  compareSplit={compareSplit}
+                  splitPos={splitPos}
+                  onSplitPosChange={setSplitPos}
+                  isPlaying={isPlaying}
+                  onTogglePlay={handleTogglePlay}
+                  sourceType={sourceType}
+                  demoMode={demoMode}
+                  onSelectDemo={handleSelectDemo}
+                  seekPercent={seekPercent}
+                  onSeek={handleSeek}
+                  timecodeText={timecodeText}
+                  isMuted={isMuted}
+                  onToggleMute={handleToggleMute}
+                  onFileDrop={loadUserMedia}
+                  customCaption={customCaption}
+                  onChangeCustomCaption={setCustomCaption}
+                  showSubControls={true}
+                />
+
+                {/* Right Rail: Dials & Camcorder Deck */}
+                <DialsRail
+                  params={params}
+                  onChangeParam={handleParamChange}
+                  osdEnabled={osdEnabled}
+                  onToggleOsd={setOsdEnabled}
+                  cinema24fps={cinema24fps}
+                  onToggleCinema24fps={setCinema24fps}
+                  osdDate={osdDate}
+                  onRandomizeDate={handleRandomizeDate}
+                  layout="rail"
+                />
+              </div>
+            </>
+          )}
         </section>
 
         {/* Footer */}

@@ -431,7 +431,7 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
         {/* Headline: REWIND THE CITY (Space Grotesk bold, VHS RGB text shadow) */}
         <div className="min-h-[46px] sm:min-h-[68px] lg:min-h-[86px] flex items-center justify-center mb-2 sm:mb-3">
           <h1
-            className={`font-['Space_Grotesk',sans-serif] font-bold text-uppercase tracking-[-0.02em] leading-[0.95] text-[#eaf4ff] text-[clamp(40px,8.2vw,96px)] ${
+            className={`font-['Space_Grotesk',sans-serif] font-bold text-uppercase tracking-[-0.02em] leading-[0.95] text-[#eaf4ff] text-[clamp(28px,7.8vw,96px)] ${
               activeLine === 'headline' ? 'has-caret' : ''
             }`}
             style={{

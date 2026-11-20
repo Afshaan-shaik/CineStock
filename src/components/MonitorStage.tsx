@@ -30,6 +30,8 @@ interface MonitorStageProps {
   onFileDrop: (file: File) => void;
   customCaption: string;
   onChangeCustomCaption: (text: string) => void;
+  showSubControls?: boolean;
+  className?: string;
 }
 
 export const MonitorStage: React.FC<MonitorStageProps> = ({
@@ -52,6 +54,8 @@ export const MonitorStage: React.FC<MonitorStageProps> = ({
   onFileDrop,
   customCaption,
   onChangeCustomCaption,
+  showSubControls = true,
+  className = '',
 }) => {
   const screenRef = useRef<HTMLDivElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
@@ -105,7 +109,7 @@ export const MonitorStage: React.FC<MonitorStageProps> = ({
   };
 
   return (
-    <div className="ctr">
+    <div className={`ctr ${className}`}>
       <div className="pn">
         <div
           ref={screenRef}
@@ -211,81 +215,85 @@ export const MonitorStage: React.FC<MonitorStageProps> = ({
           </span>
         </div>
 
-        {/* Aspect Frame Selector */}
-        <div className="row2">
-          <small>Frame</small>
-          <span id="asp" style={{ display: 'contents' }}>
-            {ASPECT_OPTIONS.map((opt) => (
-              <button
-                key={opt.value}
-                type="button"
-                onClick={() => {
-                  retroAudio.playClick();
-                  onAspectChange(opt.value);
-                }}
-                aria-pressed={aspect === opt.value}
-                className="tag"
-              >
-                {opt.label}
-              </button>
-            ))}
-          </span>
-        </div>
+        {showSubControls && (
+          <>
+            {/* Aspect Frame Selector */}
+            <div className="row2">
+              <small>Frame</small>
+              <span id="asp" style={{ display: 'contents' }}>
+                {ASPECT_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    type="button"
+                    onClick={() => {
+                      retroAudio.playClick();
+                      onAspectChange(opt.value);
+                    }}
+                    aria-pressed={aspect === opt.value}
+                    className="tag"
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </span>
+            </div>
 
-        {/* Demo Scenes */}
-        <div className="row2">
-          <small>Demo scenes</small>
-          <span id="dm" style={{ display: 'contents' }}>
-            {DEMO_REELS.map((dm) => (
-              <button
-                key={dm.key}
-                type="button"
-                onClick={() => {
-                  retroAudio.playClick();
-                  onSelectDemo(dm.key);
-                }}
-                aria-pressed={sourceType === 'video' && demoMode === dm.key}
-                className="tag"
-              >
-                {dm.label}
-              </button>
-            ))}
-          </span>
-        </div>
+            {/* Demo Scenes */}
+            <div className="row2">
+              <small>Demo scenes</small>
+              <span id="dm" style={{ display: 'contents' }}>
+                {DEMO_REELS.map((dm) => (
+                  <button
+                    key={dm.key}
+                    type="button"
+                    onClick={() => {
+                      retroAudio.playClick();
+                      onSelectDemo(dm.key);
+                    }}
+                    aria-pressed={sourceType === 'video' && demoMode === dm.key}
+                    className="tag"
+                  >
+                    {dm.label}
+                  </button>
+                ))}
+              </span>
+            </div>
 
-        {/* Custom OSD Typo / Tape Title Generator */}
-        <div className="row2" style={{ borderTop: '1px solid var(--ln)', paddingTop: '14px', marginTop: '16px' }}>
-          <small className="flex items-center gap-1.5 text-[var(--a)] font-mono">
-            <Type className="w-3.5 h-3.5" />
-            <span>OSD TYPO:</span>
-          </small>
-          <input
-            type="text"
-            value={customCaption}
-            maxLength={26}
-            onChange={(e) => onChangeCustomCaption(e.target.value)}
-            placeholder="CUSTOM TITLE..."
-            style={{
-              flex: 1,
-              minWidth: '150px',
-              background: 'var(--sf)',
-              border: '1px solid var(--ln)',
-              borderRadius: 'var(--rs)',
-              padding: '6px 12px',
-              font: '18px "VT323", monospace',
-              color: 'var(--fg)',
-              outline: 'none',
-            }}
-          />
-          <button
-            type="button"
-            onClick={handlePickRandomTypo}
-            className="tag flex items-center gap-1"
-          >
-            <Shuffle className="w-3 h-3" />
-            <span>Random</span>
-          </button>
-        </div>
+            {/* Custom OSD Typo / Tape Title Generator */}
+            <div className="row2" style={{ borderTop: '1px solid var(--ln)', paddingTop: '14px', marginTop: '16px' }}>
+              <small className="flex items-center gap-1.5 text-[var(--a)] font-mono">
+                <Type className="w-3.5 h-3.5" />
+                <span>OSD TYPO:</span>
+              </small>
+              <input
+                type="text"
+                value={customCaption}
+                maxLength={26}
+                onChange={(e) => onChangeCustomCaption(e.target.value)}
+                placeholder="CUSTOM TITLE..."
+                style={{
+                  flex: 1,
+                  minWidth: '150px',
+                  background: 'var(--sf)',
+                  border: '1px solid var(--ln)',
+                  borderRadius: 'var(--rs)',
+                  padding: '6px 12px',
+                  font: '18px "VT323", monospace',
+                  color: 'var(--fg)',
+                  outline: 'none',
+                }}
+              />
+              <button
+                type="button"
+                onClick={handlePickRandomTypo}
+                className="tag flex items-center gap-1"
+              >
+                <Shuffle className="w-3 h-3" />
+                <span>Random</span>
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );

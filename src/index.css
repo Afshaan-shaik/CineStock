@@ -560,15 +560,150 @@ footer {
   color: var(--mu);
 }
 
-@media (max-width: 1200px) {
+/* =========================================================================
+   Mobile-First Responsive System (Phones <768px, Tablets 768-1366px, Desktop >1366px)
+   ========================================================================= */
+
+/* Touch Ergonomics & Active State Feedback */
+@media (pointer: coarse) {
+  .btn, .tag, .chip, .ibtn {
+    min-height: 44px;
+  }
+  input[type="range"] {
+    touch-action: pan-x;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    width: 28px !important;
+    height: 28px !important;
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 26px !important;
+    height: 26px !important;
+  }
+}
+
+.btn:active, .tag:active, .chip:active, .canister-card:active {
+  transform: scale(0.97);
+  filter: brightness(1.15);
+}
+
+/* Scrollbar Utility for Horizontal Carousels */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Tablet Landscape Studio (1024px - 1366px) */
+@media (min-width: 1024px) and (max-width: 1366px) {
+  .lab {
+    padding: 30px 24px 80px;
+  }
   .tk {
-    grid-template-columns: 1fr;
+    grid-template-columns: 280px minmax(0, 1fr) 300px;
+    gap: 18px;
+  }
+  .tk .pn {
+    padding: 18px;
   }
   .rail {
-    position: static;
+    position: sticky;
+    top: 16px;
+    max-height: calc(100dvh - 120px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
   }
-  .chips {
-    grid-template-columns: 1fr 1fr;
-    max-height: 340px;
+  .rail::-webkit-scrollbar {
+    width: 5px;
+  }
+  .rail::-webkit-scrollbar-thumb {
+    background: var(--ln);
+    border-radius: 9px;
+  }
+}
+
+/* Tablet Portrait Studio (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .lab {
+    padding: 24px 20px 100px;
+  }
+  .tablet-portrait-stage {
+    position: sticky;
+    top: 12px;
+    z-index: 25;
+  }
+}
+
+/* Phones (< 768px): Viewfinder + Snap Sheet */
+@media (max-width: 767px) {
+  body {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  nav {
+    padding: 16px 18px;
+    font-size: 16px;
+  }
+  nav b {
+    font-size: 17px;
+  }
+  .hero {
+    padding: 32px 18px 40px;
+  }
+  .hero small {
+    font-size: 17px;
+    letter-spacing: 0.2em;
+  }
+  .hero h1 {
+    font-size: clamp(38px, 11vw, 68px);
+    margin: 16px 0 24px;
+    line-height: 0.95;
+  }
+  .hero p {
+    font-size: 15px;
+    margin-bottom: 30px;
+    line-height: 1.5;
+  }
+  .hero .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 16px 24px;
+    font-size: 15px;
+  }
+  .mq {
+    padding: 10px 0;
+    font-size: 16px;
+  }
+  .lab {
+    padding: 14px 12px 180px;
+  }
+  .phone-viewfinder {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    margin-bottom: 12px;
+  }
+  .phone-viewfinder .ctr .pn {
+    padding: 10px;
+    border-radius: 18px;
+    background: #090c14/95;
+    backdrop-filter: blur(20px);
+  }
+  .phone-viewfinder .screen {
+    min-height: 220px;
+    border-radius: 12px;
+  }
+  .phone-viewfinder .tbar {
+    margin-top: 10px;
+    gap: 8px;
+  }
+  .phone-viewfinder .tbar .tc {
+    font-size: 16px;
+    min-width: 90px;
+  }
+  footer {
+    padding: 50px 18px 120px;
+    font-size: 16px;
   }
 }
