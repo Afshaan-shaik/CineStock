@@ -1,20 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 
-export interface ProfileData {
-  name: string;
-  title: string;
-  imageUrl: string;
-  displayMode: 'round' | 'square';
-  github: string;
-  githubUser: string;
-  instagram: string;
-  instagramUser: string;
-  bio?: string;
-  updatedAt?: string;
-}
-
-const DEFAULT_PROFILE: ProfileData = {
+const DEFAULT_PROFILE = {
   name: 'Afshan Sheikh',
   title: 'Creator & Developer',
   imageUrl: '/profile-avatar.svg',
@@ -26,11 +13,9 @@ const DEFAULT_PROFILE: ProfileData = {
   bio: 'Building analog aesthetics, retro video synthesizers & creative web experiences.',
 };
 
-// In-memory cache for serverless environments where local fs might be read-only
-let memoryProfileCache: ProfileData = { ...DEFAULT_PROFILE };
+let memoryProfileCache = { ...DEFAULT_PROFILE };
 
-export default async function handler(req: any, res: any) {
-  // CORS & security headers
+export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, x-owner-token');
@@ -45,11 +30,10 @@ export default async function handler(req: any, res: any) {
     try {
       if (fs.existsSync(profileJsonPath)) {
         const raw = fs.readFileSync(profileJsonPath, 'utf8');
-        const data = JSON.parse(raw);
-        memoryProfileCache = { ...DEFAULT_PROFILE, ...data };
+        memoryProfileCache = { ...DEFAULT_PROFILE, ...JSON.parse(raw) };
       }
     } catch {
-      // Use existing memory cache
+      // Fallback to cache
     }
     return res.status(200).json({
       success: true,
@@ -58,7 +42,6 @@ export default async function handler(req: any, res: any) {
   }
 
   if (req.method === 'POST') {
-    // Check owner authorization
     const authHeader = req.headers['authorization'] || req.headers['x-owner-token'] || '';
     const token = typeof authHeader === 'string' && authHeader.startsWith('Bearer ')
       ? authHeader.slice(7).trim()
@@ -66,7 +49,6 @@ export default async function handler(req: any, res: any) {
 
     const expectedSecret = process.env.OWNER_SECRET || 'cinestock-owner-2026';
 
-    // Verify token strictly
     if (!token || token !== expectedSecret) {
       return res.status(401).json({
         success: false,
@@ -81,7 +63,6 @@ export default async function handler(req: any, res: any) {
         return res.status(400).json({ success: false, error: 'Missing request body' });
       }
 
-      // Check for auth-verification probe
       if (body.action === 'verify-auth') {
         return res.status(200).json({
           success: true,
@@ -90,14 +71,13 @@ export default async function handler(req: any, res: any) {
         });
       }
 
-      const updatedProfile: ProfileData = {
+      const updatedProfile = {
         ...memoryProfileCache,
         imageUrl: body.imageUrl || memoryProfileCache.imageUrl,
         displayMode: body.displayMode === 'square' ? 'square' : 'round',
         updatedAt: new Date().toISOString(),
       };
 
-      // Safe persistence with backup to prevent accidental deletion
       try {
         if (fs.existsSync(profileJsonPath)) {
           const backupPath = path.resolve(process.cwd(), 'public/profile.backup.json');
@@ -105,7 +85,7 @@ export default async function handler(req: any, res: any) {
         }
         fs.writeFileSync(profileJsonPath, JSON.stringify(updatedProfile, null, 2), 'utf8');
       } catch (fsErr) {
-        console.warn('Notice: Serverless filesystem read-only, updated in-memory profile:', fsErr);
+        // Read-only environment fallback
       }
 
       memoryProfileCache = updatedProfile;
@@ -115,7 +95,7 @@ export default async function handler(req: any, res: any) {
         message: 'Profile photo updated and saved permanently.',
         profile: updatedProfile,
       });
-    } catch (err: any) {
+    } catch (err) {
       return res.status(500).json({
         success: false,
         error: err?.message || 'Failed to update profile.',
