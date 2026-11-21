@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { Columns2, Download, RotateCcw, Upload, Sparkles, Volume2, VolumeX } from 'lucide-react';
+import { Columns2, Download, RotateCcw, Upload, Sparkles, Volume2, VolumeX, Info } from 'lucide-react';
 import { BackgroundBokeh } from './components/BackgroundBokeh';
 import { DialsRail } from './components/DialsRail';
 import { CineStockIntro } from './components/CineStockIntro';
+import { AboutModal } from './components/AboutModal';
 import { ExportModal } from './components/ExportModal';
 import { MarqueeBanner } from './components/MarqueeBanner';
 import { MonitorStage } from './components/MonitorStage';
@@ -10,7 +11,7 @@ import { StockRail } from './components/StockRail';
 import { MobileSnapSheet } from './components/MobileSnapSheet';
 import { TabletStudioDock } from './components/TabletStudioDock';
 import { drawOSDOverlay, formatTimecode, renderDemoFrame } from './engine/demoReels';
-import { retroAudio } from './engine/audioSynthesizer';
+import { retroAudio, AUDIO_ENABLED } from './engine/audioSynthesizer';
 import { WebGLFilmPipeline } from './engine/webglPipeline';
 import {
   DEMO_REELS,
@@ -80,6 +81,7 @@ export default function App() {
     return true;
   });
   const [audioMuted, setAudioMuted] = useState(true);
+  const [aboutOpen, setAboutOpen] = useState(false);
 
   // Core State
   const [activePreset, setActivePreset] = useState<PresetKey>('vhs94');
@@ -90,7 +92,7 @@ export default function App() {
   const [compareSplit, setCompareSplit] = useState(false);
   const [splitPos, setSplitPos] = useState(0.5);
   const [isPlaying, setIsPlaying] = useState(true);
-  const [isMuted, setIsMuted] = useState(false);
+  const [isMuted, setIsMuted] = useState(true); // Muted by default
   const [cinema24fps, setCinema24fps] = useState(true);
   const [osdEnabled, setOsdEnabled] = useState(true);
   const [osdDate, setOsdDate] = useState("NOV 16 '94");
@@ -296,14 +298,12 @@ export default function App() {
     videoEl.crossOrigin = 'anonymous';
     videoEl.loop = true;
     videoEl.playsInline = true;
-    videoEl.muted = false;
+    videoEl.muted = true;
+    videoEl.defaultMuted = true;
+    videoEl.volume = 0;
     videoEl.src = '/videos/nature.webm';
     videoEl.onloadedmetadata = () => {
-      videoEl.play().catch(() => {
-        videoEl.muted = true;
-        setIsMuted(true);
-        videoEl.play().catch(() => {});
-      });
+      videoEl.play().catch(() => {});
     };
     videoRef.current = videoEl;
 
@@ -372,6 +372,8 @@ export default function App() {
       videoEl.pause();
       videoEl.src = reel.videoSrc;
       videoEl.currentTime = 0;
+      videoEl.muted = true;
+      videoEl.volume = 0;
       videoEl.onloadedmetadata = () => {
         videoEl
           .play()
@@ -411,7 +413,8 @@ export default function App() {
       imageEl.src = url;
     } else if (file.type.startsWith('video/') && videoEl) {
       setSourceType('video');
-      videoEl.muted = isMuted;
+      videoEl.muted = true;
+      videoEl.volume = 0;
       videoEl.src = url;
       videoEl.onloadedmetadata = () => {
         videoEl
@@ -442,6 +445,14 @@ export default function App() {
   };
 
   const handleToggleMute = () => {
+    if (!AUDIO_ENABLED) {
+      setIsMuted(true);
+      if (videoRef.current) {
+        videoRef.current.muted = true;
+        videoRef.current.volume = 0;
+      }
+      return;
+    }
     const next = !isMuted;
     setIsMuted(next);
     if (videoRef.current) {
@@ -634,6 +645,7 @@ export default function App() {
   };
 
   const handleToggleGlobalAudio = () => {
+    if (!AUDIO_ENABLED) return;
     const next = !audioMuted;
     setAudioMuted(next);
     retroAudio.setMuted(next);
@@ -647,6 +659,7 @@ export default function App() {
           onEnterLab={() => {
             setShowIntro(false);
           }}
+          onOpenAbout={() => setAboutOpen(true)}
         />
       )}
 
@@ -682,12 +695,12 @@ export default function App() {
             </button>
             <button
               type="button"
-              onClick={handleToggleGlobalAudio}
-              className="tag inline-flex items-center justify-center gap-1 min-h-[38px] px-2.5 sm:px-3 text-xs sm:text-sm"
-              title={audioMuted ? 'Turn Sound FX ON' : 'Turn Sound FX OFF'}
+              onClick={() => setAboutOpen(true)}
+              className="tag inline-flex items-center justify-center gap-1.5 min-h-[38px] px-2.5 sm:px-3 text-xs sm:text-sm text-[var(--tx)] hover:text-white transition-colors cursor-pointer"
+              title="About the Creator"
             >
-              {audioMuted ? <VolumeX className="w-3.5 h-3.5 text-red-400" /> : <Volume2 className="w-3.5 h-3.5 text-[var(--a)]" />}
-              <span className="hidden min-[380px]:inline">{audioMuted ? 'MUTE' : 'AUDIO'}</span>
+              <Info className="w-3.5 h-3.5 text-[var(--a)]" />
+              <span>ABOUT</span>
             </button>
           </div>
         </nav>
@@ -988,6 +1001,9 @@ export default function App() {
         {/* Footer */}
         <footer>CINESTOCK — PLAY ►</footer>
       </div>
+
+      {/* About Profile Modal */}
+      <AboutModal isOpen={aboutOpen} onClose={() => setAboutOpen(false)} />
 
       {/* Export Progress & Download Modal */}
       <ExportModal

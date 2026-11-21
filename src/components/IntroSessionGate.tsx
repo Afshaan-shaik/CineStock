@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Sparkles, Volume2, VolumeX, ArrowRight, Disc } from 'lucide-react';
-import { retroAudio } from '../engine/audioSynthesizer';
+import { retroAudio, AUDIO_ENABLED } from '../engine/audioSynthesizer';
 
 interface IntroSessionGateProps {
   onEnterLab: () => void;
@@ -61,14 +61,16 @@ export const IntroSessionGate: React.FC<IntroSessionGateProps> = ({
       </div>
 
       <div className="absolute top-6 right-6 sm:top-10 sm:right-12 flex items-center gap-4 z-20">
-        <button
-          type="button"
-          onClick={onToggleAudio}
-          className="flex items-center gap-2 px-4 py-1.5 rounded text-xs font-mono bg-[#0b1020]/90 border border-[rgba(120,220,255,0.2)] text-[var(--mu)] hover:text-[var(--fg)] hover:border-[var(--a)] transition-all cursor-pointer backdrop-blur-md"
-        >
-          {audioMuted ? <VolumeX className="w-3.5 h-3.5 text-red-400" /> : <Volume2 className="w-3.5 h-3.5 text-[var(--a)]" />}
-          <span>{audioMuted ? 'AUDIO: OFF' : 'AUDIO: ON'}</span>
-        </button>
+        {AUDIO_ENABLED && (
+          <button
+            type="button"
+            onClick={onToggleAudio}
+            className="flex items-center gap-2 px-4 py-1.5 rounded text-xs font-mono bg-[#0b1020]/90 border border-[rgba(120,220,255,0.2)] text-[var(--mu)] hover:text-[var(--fg)] hover:border-[var(--a)] transition-all cursor-pointer backdrop-blur-md"
+          >
+            {audioMuted ? <VolumeX className="w-3.5 h-3.5 text-red-400" /> : <Volume2 className="w-3.5 h-3.5 text-[var(--a)]" />}
+            <span>{audioMuted ? 'AUDIO: OFF' : 'AUDIO: ON'}</span>
+          </button>
+        )}
       </div>
 
       {/* Main Intro Stage */}

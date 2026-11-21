@@ -1,13 +1,31 @@
 // Web Audio API Retro Analog Synthesizer
 // Provides tape hiss, mechanical clicks, cassette motor hum, and camcorder beeps
 
+// =========================================================================
+// CENTRALIZED AUDIO CONTROL
+// Temporarily set to false to completely silence CineStock across all
+// devices, views, interactions, and background operations.
+// Flip this single constant to true whenever audio should be restored.
+// =========================================================================
+export const AUDIO_ENABLED = false;
+
+export function isAudioEnabled(): boolean {
+  return AUDIO_ENABLED;
+}
+
 class RetroAudioEngine {
   private ctx: AudioContext | null = null;
   private isMuted: boolean = true; // default muted to be polite
   private humGain: GainNode | null = null;
   private noiseNode: AudioNode | null = null;
 
+  constructor() {
+    // Immediate silence enforcement: ensure muted state by default
+    this.isMuted = true;
+  }
+
   private getContext(): AudioContext | null {
+    if (!AUDIO_ENABLED) return null;
     if (typeof window === 'undefined') return null;
     if (!this.ctx) {
       const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -22,6 +40,10 @@ class RetroAudioEngine {
   }
 
   public setMuted(muted: boolean) {
+    if (!AUDIO_ENABLED) {
+      this.isMuted = true;
+      return;
+    }
     this.isMuted = muted;
     if (this.humGain) {
       this.humGain.gain.setValueAtTime(muted ? 0 : 0.04, this.ctx?.currentTime ?? 0);
@@ -29,12 +51,13 @@ class RetroAudioEngine {
   }
 
   public getMuted(): boolean {
+    if (!AUDIO_ENABLED) return true;
     return this.isMuted;
   }
 
   // Tape cassette insertion sound: mechanical spring clunk + motor spool spin
   public playCassetteInsert() {
-    if (this.isMuted) return;
+    if (!AUDIO_ENABLED || this.isMuted) return;
     const ctx = this.getContext();
     if (!ctx) return;
 
@@ -55,7 +78,7 @@ class RetroAudioEngine {
 
     // Secondary latch click
     setTimeout(() => {
-      if (this.isMuted || !this.ctx) return;
+      if (!AUDIO_ENABLED || this.isMuted || !this.ctx) return;
       const t2 = this.ctx.currentTime;
       const osc2 = this.ctx.createOscillator();
       const g2 = this.ctx.createGain();
@@ -73,7 +96,7 @@ class RetroAudioEngine {
 
   // Camcorder confirmation beep
   public playCamcorderBeep() {
-    if (this.isMuted) return;
+    if (!AUDIO_ENABLED || this.isMuted) return;
     const ctx = this.getContext();
     if (!ctx) return;
 
@@ -92,7 +115,7 @@ class RetroAudioEngine {
 
   // Tactile knob/chip click
   public playClick() {
-    if (this.isMuted) return;
+    if (!AUDIO_ENABLED || this.isMuted) return;
     const ctx = this.getContext();
     if (!ctx) return;
 
@@ -112,4 +135,3 @@ class RetroAudioEngine {
 }
 
 export const retroAudio = new RetroAudioEngine();
-

@@ -7,7 +7,7 @@ import {
   type DemoMode,
   type SourceType,
 } from '../types/lab';
-import { retroAudio } from '../engine/audioSynthesizer';
+import { retroAudio, AUDIO_ENABLED } from '../engine/audioSynthesizer';
 import { Type, Shuffle } from 'lucide-react';
 
 interface MonitorStageProps {
@@ -185,19 +185,21 @@ export const MonitorStage: React.FC<MonitorStageProps> = ({
             {isPlaying ? '❚❚' : '►'}
           </button>
 
-          <button
-            type="button"
-            id="mu"
-            onClick={() => {
-              retroAudio.playClick();
-              onToggleMute();
-            }}
-            aria-label="Mute or unmute"
-            style={{ opacity: isMuted ? 0.45 : 1 }}
-            className="btn ibtn"
-          >
-            ♪
-          </button>
+          {AUDIO_ENABLED && (
+            <button
+              type="button"
+              id="mu"
+              onClick={() => {
+                retroAudio.playClick();
+                onToggleMute();
+              }}
+              aria-label="Mute or unmute"
+              style={{ opacity: isMuted ? 0.45 : 1 }}
+              className="btn ibtn"
+            >
+              ♪
+            </button>
+          )}
 
           <input
             type="range"

@@ -1,8 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { retroAudio } from '../engine/audioSynthesizer';
+import { retroAudio, AUDIO_ENABLED } from '../engine/audioSynthesizer';
+import { Info } from 'lucide-react';
 
 interface CineStockIntroProps {
   onEnterLab: () => void;
+  onOpenAbout?: () => void;
 }
 
 interface StickerState {
@@ -55,7 +57,7 @@ function getNeighborChar(char: string): string {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) => {
+export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab, onOpenAbout }) => {
   const [isEntering, setIsEntering] = useState(false);
   const [buttonText, setButtonText] = useState('ENTER THE LAB');
 
@@ -278,10 +280,12 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
     if (isEntering) return;
     setIsEntering(true);
     setButtonText('LOADING REEL...');
-    try {
-      retroAudio.playCassetteInsert();
-    } catch {
-      // Audio autoplay gracefully handled
+    if (AUDIO_ENABLED) {
+      try {
+        retroAudio.playCassetteInsert();
+      } catch {
+        // Audio autoplay gracefully handled
+      }
     }
 
     setTimeout(() => {
@@ -348,10 +352,24 @@ export const CineStockIntro: React.FC<CineStockIntroProps> = ({ onEnterLab }) =>
           </span>
         </div>
 
-        <div className="pointer-events-auto font-['Space_Mono',monospace] text-[11px] sm:text-xs tracking-[0.2em] text-[#8d9ab3] uppercase flex items-center gap-1.5">
-          <span>REC</span>
-          <span className="text-[#ef4444] animate-pulse">●</span>
-          <span>24 STOCKS ONLINE</span>
+        <div className="pointer-events-auto font-['Space_Mono',monospace] text-[11px] sm:text-xs tracking-[0.2em] text-[#8d9ab3] uppercase flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-1.5">
+            <span>REC</span>
+            <span className="text-[#ef4444] animate-pulse">●</span>
+            <span className="hidden min-[480px]:inline">24 STOCKS ONLINE</span>
+            <span className="min-[480px]:hidden">24 STOCKS</span>
+          </div>
+          {onOpenAbout && (
+            <button
+              type="button"
+              onClick={onOpenAbout}
+              className="tag inline-flex items-center gap-1 px-2.5 py-1 text-[11px] text-[#eaf4ff] hover:text-white bg-[#0e121d]/80 border border-[rgba(120,220,255,0.2)] rounded cursor-pointer transition-colors"
+              title="About the Creator"
+            >
+              <Info className="w-3 h-3 text-[var(--a)]" />
+              <span>ABOUT</span>
+            </button>
+          )}
         </div>
       </header>
 
