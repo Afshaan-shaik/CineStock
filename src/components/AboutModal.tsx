@@ -119,7 +119,7 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
     setIsVerifying(true);
     setAuthError(null);
 
-    const expectedSecret = 'cinestock-owner-2026';
+    const expectedSecret = '2577';
 
     if (passcode.trim() === expectedSecret) {
       sessionStorage.setItem('cinestock_owner_token', passcode.trim());
