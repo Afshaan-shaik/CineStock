@@ -69,27 +69,22 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
     if (!isOpen) return;
 
     let isMounted = true;
-    fetch('/api/profile')
-      .then((res) => {
-        if (!res.ok) throw new Error('API unavailable, fallback to profile.json');
-        return res.json();
-      })
+    fetch('/profile.json')
+      .then((r) => r.json())
       .then((data) => {
-        if (isMounted && data.success && data.profile) {
-          setProfile((prev) => ({ ...prev, ...data.profile }));
+        if (isMounted && data) {
+          try {
+            const savedProfile = localStorage.getItem('cinestock_published_profile');
+            if (savedProfile) {
+              const parsed = JSON.parse(savedProfile);
+              setProfile((prev) => ({ ...prev, ...data, ...parsed }));
+              return;
+            }
+          } catch {}
+          setProfile((prev) => ({ ...prev, ...data }));
         }
       })
-      .catch(() => {
-        // Fallback to static profile.json
-        fetch('/profile.json')
-          .then((r) => r.json())
-          .then((data) => {
-            if (isMounted && data) {
-              setProfile((prev) => ({ ...prev, ...data }));
-            }
-          })
-          .catch(() => {});
-      });
+      .catch(() => {});
 
     return () => {
       isMounted = false;
@@ -117,37 +112,24 @@ export const AboutModal: React.FC<AboutModalProps> = ({ isOpen, onClose }) => {
   }, [isOpen, showPhotoEditor, showAuthDialog, onClose]);
 
   // Handle owner login / authentication
-  const handleVerifyOwner = async (e: React.FormEvent) => {
+  const handleVerifyOwner = (e: React.FormEvent) => {
     e.preventDefault();
     if (!passcode.trim()) return;
 
     setIsVerifying(true);
     setAuthError(null);
 
-    try {
-      const res = await fetch('/api/profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${passcode.trim()}`,
-        },
-        body: JSON.stringify({ action: 'verify-auth' }),
-      });
+    const expectedSecret = 'cinestock-owner-2026';
 
-      const data = await res.json();
-
-      if (res.ok && data.success) {
-        sessionStorage.setItem('cinestock_owner_token', passcode.trim());
-        setOwnerToken(passcode.trim());
-        setIsOwnerAuthenticated(true);
-        setShowAuthDialog(false);
-        setPasscode('');
-      } else {
-        setAuthError(data.error || 'Invalid passcode. Access denied.');
-      }
-    } catch {
-      setAuthError('Connection error. Could not verify owner credentials.');
-    } finally {
+    if (passcode.trim() === expectedSecret) {
+      sessionStorage.setItem('cinestock_owner_token', passcode.trim());
+      setOwnerToken(passcode.trim());
+      setIsOwnerAuthenticated(true);
+      setShowAuthDialog(false);
+      setPasscode('');
+      setIsVerifying(false);
+    } else {
+      setAuthError('Invalid passcode. Access denied.');
       setIsVerifying(false);
     }
   };

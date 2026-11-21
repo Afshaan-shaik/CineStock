@@ -236,23 +236,16 @@ export const ProfilePhotoEditor: React.FC<ProfilePhotoEditorProps> = ({
       // Convert to optimized WebP (or PNG fallback)
       const optimizedDataUrl = canvas.toDataURL('image/webp', 0.92);
 
-      // Call serverless / persistent endpoint
-      const response = await fetch('/api/profile', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${ownerToken}`,
-        },
-        body: JSON.stringify({
-          imageUrl: optimizedDataUrl,
-          displayMode: displayMode,
-        }),
-      });
+      const updatedProfile = {
+        imageUrl: optimizedDataUrl,
+        displayMode: displayMode,
+      };
 
-      const resData = await response.json();
-
-      if (!response.ok || !resData.success) {
-        throw new Error(resData.error || 'Server rejected photo update.');
+      // Persist across browser sessions and refreshes
+      try {
+        localStorage.setItem('cinestock_published_profile', JSON.stringify(updatedProfile));
+      } catch (storageErr) {
+        console.warn('Storage limit warning:', storageErr);
       }
 
       // Revoke temp object URL
@@ -262,7 +255,7 @@ export const ProfilePhotoEditor: React.FC<ProfilePhotoEditorProps> = ({
       }
 
       // Notify parent AboutModal of updated profile
-      onSaved(resData.profile);
+      onSaved(updatedProfile);
       onClose();
     } catch (err: any) {
       console.error('Save failed:', err);
